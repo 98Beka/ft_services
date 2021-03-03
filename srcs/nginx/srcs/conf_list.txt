@@ -1,2 +1,0 @@
-1 minikube addons enable metallb
-2 aplly ...yaml
