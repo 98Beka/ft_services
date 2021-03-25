@@ -4,30 +4,15 @@ RUN apk update && apk upgrade
 RUN apk add nginx openssl openssh-server supervisor
 RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 -subj '/CN=localhost' -keyout /etc/ssl/localhost.key -out /etc/ssl/localhost.crt
 RUN mkdir /run/nginx;
-RUN mkdir /www;
+
   
-RUN echo -e "\
-server {                                     \n\
-  listen 443          ssl;                   \n\
-  listen [::]:443     ssl;                   \n\
-  ssl_certificate_key /etc/ssl/localhost.key;\n\
-  ssl_certificate     /etc/ssl/localhost.crt;\n\
-  root                /www;                  \n\
-  location / {                               \n\
-    index               hi.html;             \n\
-  }                                          \n\
-  location /phpmyadmin/ {                    \n\
-    proxy_pass https://192.168.99.240:5000/; \n\
-  }                                          \n\
-  location /wordpress {                      \n\
-  return 307 https://192.168.99.240:5050;    \n\
-  }                                          \n\
-}                                            \n\
-server {                                     \n\
-  listen        80;                          \n\
-  listen        [::]:80;                     \n\
-  return 301 https://\$host\$request_uri;    \n\
-}" > /etc/nginx/conf.d/default.conf;
+COPY nginx.conf /etc/nginx/nginx.conf
+
+
+RUN adduser -D -g 'www' www
+RUN mkdir /www;
+RUN chown -R www:www /var/lib/nginx
+RUN chown -R www:www /www
 
 RUN echo -e "<!DOCTYPE html>                 \n\
 <html lang=\"en\">                           \n\
@@ -38,7 +23,7 @@ RUN echo -e "<!DOCTYPE html>                 \n\
 <body>                                       \n\
     hellow!                                  \n\
 </body>                                      \n\
-</html>" > /www/hi.html;
+</html>" > /www/index.html;
 
 #supervisor
 RUN echo -e "\
@@ -46,10 +31,10 @@ RUN echo -e "\
 nodaemon=true                                \n\
 [program:nginx]                              \n\
 command=sh -c \"nginx -g 'daemon off;' &&\
-kill -s SIGSTREM $(cat supervisord.pid)\"    \n\
+kill -s SIGSTREM \$(cat supervisord.pid)\"   \n\
 [program:sshd]                               \n\
 command=sh -c \"/usr/sbin/sshd -D &&\
-kill -s SIGSTREM $(cat supervisord.pid)\"    \n\
+kill -s SIGSTREM \$(cat supervisord.pid)\"   \n\
 stdout_logfile=/home/nginx.log               \n\
 stderr_logfile=/home/nginxerr.log            \n\
 " > /etc/supervisord.conf

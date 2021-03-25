@@ -5,13 +5,13 @@ RUN apk add openrc mysql mysql-client
 RUN openrc && touch /run/openrc/softlevel
 RUN mkdir -p /run/mysqld
 RUN echo -e "\
-[mysqld]                             	        \n\
-user = root                          	        \n\
-datadir = /var/lib/mysql             	        \n\
-port = 3306                          	        \n\
-log-bin = /var/lib/mysql/mysql-bin   	        \n\
-bind-address = 0.0.0.0               	        \n\
-skip-networking = false              	        \n\
+[mysqld]\n\
+user = root\n\
+datadir = /var/lib/mysql\n\
+port = 3306\n\
+log-bin = /var/lib/mysql/mysql-bin\n\
+bind-address = 0.0.0.0\n\
+skip-networking = false\n\
 " > /etc/mysql/my.cnf
 RUN echo -e "\
 echo \"CREATE DATABASE wordpress;\" | mysql                                             \n\

@@ -15,37 +15,22 @@ RUN wget https://files.phpmyadmin.net/phpMyAdmin/5.0.4/phpMyAdmin-5.0.4-english.
 RUN tar -zxvf phpMyAdmin-5.0.4-english.tar.gz && rm phpMyAdmin-5.0.4-english.tar.gz
 RUN mv phpMyAdmin-5.0.4-english /www/phpmyadmin 
 RUN echo -e "\
-<?php                                             \n\
-\$cfg['blowfish_secret'] = 'beklightbeklight';    \n\
-\$i = 1;                                          \n\
-\$cfg['Servers'][\$i]['auth_type'] = 'cookie';    \n\
-\$cfg['Servers'][\$i]['host'] = 'mysql-svc';      \n\
-\$cfg['Servers'][\$i]['port'] = '3306';           \n\
-\$cfg['Servers'][\$i]['compress'] = false;        \n\
-\$cfg['Servers'][\$i]['AllowNoPassword'] = false; \n\
-\$cfg['Servers'][\$i]['user'] = 'ehande';         \n\
-\$cfg['Servers'][\$i]['password'] = 'ehande';     \n\
+<?php\n\
+\$cfg['blowfish_secret'] = 'beklightbeklight';\n\
+\$i = 1;\n\
+\$cfg['Servers'][\$i]['auth_type'] = 'cookie';\n\
+\$cfg['Servers'][\$i]['host'] = 'mysql-svc';\n\
+\$cfg['Servers'][\$i]['port'] = '3306';\n\
+\$cfg['Servers'][\$i]['compress'] = false;\n\
+\$cfg['Servers'][\$i]['AllowNoPassword'] = false;\n\
+\$cfg['Servers'][\$i]['user'] = 'ehande';\n\
+\$cfg['Servers'][\$i]['password'] = 'ehande';\n\
 " > /www/phpmyadmin/config.inc.php
 
                  #nginx
 ######################################################
 RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 -subj '/CN=localhost' -keyout /etc/ssl/localhost.key -out /etc/ssl/localhost.crt
-RUN echo -e "\
-server {                                             \n\
-    listen          5000 ssl;                        \n\
-    listen          [::]:5000 ssl;                   \n\
-    server_name     localhost;                       \n\
-    root            /www/phpmyadmin/;                \n\
-    sendfile                    on;                  \n\
-    index           index.php;                       \n\
-    location ~ \.php$ {                              \n\
-        fastcgi_pass   127.0.0.1:9000;               \n\
-        fastcgi_index     index.php;                 \n\
-        fastcgi_param  SCRIPT_FILENAME  \$document_root\$fastcgi_script_name;\n\
-        include        fastcgi.conf;}                \n\
-    ssl_certificate_key /etc/ssl/localhost.key;      \n\
-    ssl_certificate     /etc/ssl/localhost.crt;      \n\
-}" > /etc/nginx/conf.d/default.conf;
+COPY nginx.conf /etc/nginx/nginx.conf
 
                  #supervisor
 ######################################################
