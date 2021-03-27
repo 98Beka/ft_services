@@ -15,6 +15,8 @@ RUN wget https://wordpress.org/latest.tar.gz \
 && tar -zxvf latest.tar.gz \
 && mv wordpress www/wordpress \
 && rm -rf latest.tar.gz
+RUN ln -s www/wordpress /var/www/localhost/htdocs/wordpress
+COPY ./wp-config.php /var/www/localhost/htdocs/wordpress/wp-config.php
 RUN rm -rf /www/wordpress/wp-config.php
 RUN echo -e "\
 <?php\n\
@@ -29,8 +31,8 @@ define( 'WP_DEBUG', false );\n\
 if ( ! defined( 'ABSPATH' ) ) {\n\
         define( 'ABSPATH', __DIR__ . '/' );\n\
 }\n\
-require_once ABSPATH . 'wp-settings.php';\n\
-" >  /www/wordpress/wp-config.php
+require_once ABSPATH . 'wp-settings.php';\
+" >  /var/www/localhost/htdocs/wordpress/wp-config.php
 
                  #nginx
 ######################################################
