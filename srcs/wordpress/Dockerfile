@@ -16,26 +16,24 @@ RUN wget https://wordpress.org/latest.tar.gz \
 && mv wordpress www/wordpress \
 && rm -rf latest.tar.gz
 RUN rm -rf /www/wordpress/wp-config.php
-RUN echo -e "\
-<?php\n\
-define( 'DB_NAME', 'wordpress' );\n\
-define( 'DB_USER', 'admin' );\n\
-define( 'DB_PASSWORD', 'admin' );\n\
-define( 'DB_HOST', 'mysql-svc' );\n\
-define( 'DB_CHARSET', 'utf8' );\n\
-define( 'DB_COLLATE', '' );\n\
-\$table_prefix = 'wp_';\n\
-define( 'WP_DEBUG', false );\n\
-if ( ! defined( 'ABSPATH' ) ) {\n\
-        define( 'ABSPATH', __DIR__ . '/' );\n\
-}\n\
-require_once ABSPATH . 'wp-settings.php';\n\
-" >  /www/wordpress/wp-config.php
-
                  #nginx
 ######################################################
 RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 -subj '/CN=localhost' -keyout /etc/ssl/localhost.key -out /etc/ssl/localhost.crt
-COPY nginx.conf /etc/nginx/nginx.conf
+RUN echo -e "\
+server {				        \n\
+    listen          5050 ssl;   \n\
+    listen          [::]:5050 ssl;\n\
+	server_name localhost;		\n\
+	root        /www/wordpress/;\n\
+    index 		index.php;	    \n\
+	location ~ \.php$ {		    \n\
+        fastcgi_pass   127.0.0.1:9000;	\n\
+        fastcgi_param  SCRIPT_FILENAME  \$document_root\$fastcgi_script_name;\n\
+        include        fastcgi.conf; }  \n\
+    ssl_certificate_key /etc/ssl/localhost.key;\n\
+    ssl_certificate     /etc/ssl/localhost.crt;\n\
+    error_page 497 https://$host:$server_port$request_uri;\n\
+}" > /etc/nginx/conf.d/default.conf;
 
                  #supervisor
 ######################################################
