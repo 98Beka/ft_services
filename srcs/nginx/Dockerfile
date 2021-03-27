@@ -21,7 +21,7 @@ RUN echo -e "<!DOCTYPE html>                 \n\
     <title>HTML5</title>                     \n\
 </head>                                      \n\
 <body>                                       \n\
-    hellow!                                  \n\
+    hello!                                  \n\
 </body>                                      \n\
 </html>" > /www/index.html;
 

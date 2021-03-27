@@ -19,14 +19,14 @@ echo \"CREATE USER 'admin'@'localhost' IDENTIFIED BY 'admin';\" | mysql  	      
 echo \"GRANT ALL PRIVILEGES ON wordpress.* TO admin IDENTIFIED BY 'admin';\" | mysql    \n\
 " > /db_creat.sh
 RUN chmod +x db_creat.sh
+COPY wordpress.sql .
 RUN echo -e "\
 #!/bin/sh              					        \n\
 openrc       						            \n\
 /etc/init.d/mariadb setup				        \n\
 rc-service mariadb start                        \n\
 ./db_creat.sh           			            \n\
-# mysql < conf.sql           			        \n\
-# mysql -uroot -pexample wordpress < wordpress.sql\n\
+mysql wordpress -u root < wordpress.sql         \n\
 rc-service mariadb stop					        \n\
 /usr/bin/mysqld_safe --datadir='/var/lib/mysql' \n\
 " > /run.sh

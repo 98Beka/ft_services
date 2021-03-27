@@ -1,15 +1,12 @@
 FROM alpine:3.12
-RUN apk update && apk upgrade
-RUN apk add wget
 
-RUN wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub
-RUN wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.32-r0/glibc-2.32-r0.apk
-RUN apk add glibc-2.32-r0.apk
+RUN	apk update
+RUN	apk add grafana --repository http://dl-cdn.alpinelinux.org/alpine/edge/community/ --allow-untrusted
 
-RUN wget https://dl.grafana.com/oss/release/grafana-7.3.6.linux-amd64.tar.gz
-RUN tar -xvzf grafana-7.3.6.linux-amd64.tar.gz && rm grafana-7.3.6.linux-amd64.tar.gz
-RUN mv grafana-7.3.6 grafana
-
+COPY datasources.yaml /usr/share/grafana/conf/provisioning/datasources/influxdb.yaml
+COPY dashboards.yaml /usr/share/grafana/conf/provisioning/dashboards/dashboards.yaml
+COPY grafana.db /usr/share/grafana/data/grafana.db
 
 EXPOSE 3000
-CMD cd grafana/bin ; ./grafana-server
+
+CMD /usr/sbin/grafana-server --homepath=/usr/share/grafana
