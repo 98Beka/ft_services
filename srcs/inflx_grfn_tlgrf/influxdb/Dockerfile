@@ -1,7 +1,6 @@
 FROM alpine:3.12
-RUN apk update && apk upgrade && apk add wget
-RUN apk --update --no-cache add influxdb --repository\
- http://dl-2.alpinelinux.org/alpine/edge/community/
+RUN apk update && apk upgrade && apk add wget influxdb
+RUN apk add --repository http://dl-2.alpinelinux.org/alpine/edge/community/ --allow-untrusted --no-cache
 
 COPY	./influxdb.conf /etc/influxdb.conf
 RUN echo -e "\
